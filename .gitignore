@@ -1,0 +1,16 @@
+# Ignore les fichiers de configuration sensibles
+.env
+config/*.secret
+
+# Ignore les fichiers de build
+/build/
+/dist/
+
+# Ignore les fichiers de dépendances
+node_modules/
+
+# Ignore les fichiers systèmes (macOS)
+.DS_Store
+
+# Ignore les fichiers log
+*.log
