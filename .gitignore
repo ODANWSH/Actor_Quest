@@ -1,5 +1,9 @@
 # Ignore les fichiers de configuration sensibles
-.env
+env/
+.venv/
+venv/
+ENV/
+*.env
 config/*.secret
 
 # Ignore les fichiers de build
