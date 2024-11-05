@@ -5,6 +5,7 @@ venv/
 ENV/
 *.env
 
+# Ignorer le fichier script.js
 config.js
 
 # Ignore les fichiers de build
