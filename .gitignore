@@ -5,6 +5,8 @@ venv/
 ENV/
 *.env
 
+config.js
+
 # Ignore les fichiers de build
 /build/
 /dist/

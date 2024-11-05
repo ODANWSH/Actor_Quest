@@ -1,6 +1,5 @@
-require("dotenv").config();
-const apiKey = process.env.API_KEY;
-
+var key = config.SECRET_API_KEY;
+console.log(key);
 document.getElementById("search-button").addEventListener("click", function () {
   performSearch();
 });
@@ -16,7 +15,7 @@ document
 function performSearch() {
   const query = document.getElementById("search-input").value;
   fetch(
-    `https://api.themoviedb.org/3/search/person?api_key=5915feda1fbb058eb5da0c7f913f997f&query=${query}`
+    `https://api.themoviedb.org/3/search/person?api_key=${key}f&query=${query}`
   )
     .then((response) => {
       if (!response.ok) {
