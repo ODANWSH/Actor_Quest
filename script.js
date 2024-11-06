@@ -37,7 +37,10 @@ function performSearch() {
 
         const actorDiv = document.createElement("div");
         actorDiv.className = "actor";
-        actorDiv.addEventListener("click", () => putResultInRightArea(actor));
+        actorDiv.addEventListener("click", () => {
+          putResultInRightArea(actor);
+          putListOfFilm(actor);
+        });
 
         const img = document.createElement("img");
         img.src = actorImage;
@@ -144,7 +147,7 @@ function putResultInRightArea(actor) {
     });
 }
 
-function putListOfFilm() {
+function putListOfFilm(actor) {
   const listOfFilm = document.getElementById("about-actor-film");
   listOfFilm.innerHTML = ""; // Effacer les résultats précédents
 
@@ -158,16 +161,30 @@ function putListOfFilm() {
       return response.json();
     })
     .then((listMovie) => {
-      const movieList = listMovie.title;
-
       const movieDiv = document.createElement("div");
       movieDiv.className = "movie-list";
 
-      const movieElement = document.createElement("p");
-      movieElement.textContent = movieList;
+      const movieTitle = document.createElement("h3");
+      movieTitle.textContent = "Movies:";
+      movieDiv.appendChild(movieTitle);
 
-      movieDiv.appendChild(movieElement);
+      const movieList = document.createElement("ul");
 
+      if (listMovie.cast && listMovie.cast.length > 0) {
+        listMovie.cast.forEach((movie) => {
+          const filmItem = document.createElement("li");
+          filmItem.textContent = `${movie.title} (${
+            movie.release_date?.split("-")[0] || "N/A"
+          })`;
+          movieList.appendChild(filmItem);
+        });
+      } else {
+        const noMovie = document.createElement("p");
+        noMovie.textContent = "No movies available.";
+        movieDiv.appendChild(noMovie);
+      }
+
+      movieDiv.appendChild(movieList);
       listOfFilm.appendChild(movieDiv);
     });
 }
