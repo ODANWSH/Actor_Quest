@@ -10,11 +10,29 @@ document
     }
   });
 
+function getAge(birthday, deathDate = null) {
+  if (!birthday) return "Age not available"; // Si la date de naissance est manquante
+  const birthDate = new Date(birthday);
+  const endDate = deathDate ? new Date(deathDate) : new Date(); // Utilise la date de décès si elle existe, sinon la date actuelle
+
+  let age = endDate.getFullYear() - birthDate.getFullYear();
+  const monthDifference = endDate.getMonth() - birthDate.getMonth();
+
+  // Ajustement si l'anniversaire n'est pas encore passé cette année
+  if (
+    monthDifference < 0 ||
+    (monthDifference === 0 && endDate.getDate() < birthDate.getDate())
+  ) {
+    age--;
+  }
+
+  return `${age} years old`;
+}
+
 function putResultInRightArea(actor) {
   const aboutActorDiv = document.getElementById("about-actor");
   aboutActorDiv.innerHTML = ""; // Effacer les résultats précédents
 
-  const actorId = actor.id;
   const actorName = actor.name;
   const actorImage = actor.profile_path
     ? `https://image.tmdb.org/t/p/w200${actor.profile_path}`
@@ -29,34 +47,55 @@ function putResultInRightArea(actor) {
       }
       return response.json();
     })
-    .then((json) => {});
+    .then((detailedActor) => {
+      // Biographie et calcul de l'âge
+      let actorBiography =
+        detailedActor.biography || "This actor does not have a biography.";
+      let age = getAge(detailedActor.birthday, detailedActor.deathday);
+      let dateOfDeath = detailedActor.deathday || "This actor is not dead.";
+      // Création de la div pour l'acteur sélectionné
+      const actorDiv = document.createElement("div");
+      actorDiv.className = "actor-detail"; // Ajouter une classe pour le style
 
-  // Création de la div pour l'acteur sélectionné
-  const actorDiv = document.createElement("div");
-  actorDiv.className = "actor-detail"; // Ajouter une classe pour le style
+      // Image de l'acteur
+      const img = document.createElement("img");
+      img.src = actorImage;
+      img.alt = actorName;
+      img.style.width = "100px";
+      img.style.height = "auto";
 
-  // Image de l'acteur
-  const img = document.createElement("img");
-  img.src = actorImage;
-  img.alt = actorName;
-  img.style.width = "100px";
-  img.style.height = "auto";
+      // Nom de l'acteur
+      const nameElement = document.createElement("h2");
+      nameElement.textContent = actorName;
 
-  const nameElement = document.createElement("h2");
-  nameElement.textContent = actorName;
+      // Affichage de l'âge
+      const ageElement = document.createElement("p");
+      ageElement.textContent = `Age: ${age}`;
 
-  const putTitleBiography = document.createElement("h3");
-  putTitleBiography.textContent = "Biography :";
+      const deathDay = document.createElement("p");
+      deathDay.textContent = `Date of death: ${dateOfDeath}`;
 
-  const biographyElement = document.createElement("p");
-  biographyElement.textContent = actorBiography;
+      // Titre pour la biographie
+      const biographyTitle = document.createElement("h3");
+      biographyTitle.textContent = "Biography:";
 
-  actorDiv.appendChild(img);
-  actorDiv.appendChild(nameElement);
-  actorDiv.appendChild(biographyElement);
-  actorDiv.appendChild(putTitleBiography);
+      // Biographie de l'acteur
+      const biographyElement = document.createElement("p");
+      biographyElement.textContent = actorBiography;
 
-  aboutActorDiv.appendChild(actorDiv); // Affichage du résultat sélectionné
+      // Ajout des éléments à la div principale
+      actorDiv.appendChild(img);
+      actorDiv.appendChild(nameElement);
+      actorDiv.appendChild(ageElement); // Affiche l'âge
+      actorDiv.appendChild(deathDay);
+      actorDiv.appendChild(biographyTitle);
+      actorDiv.appendChild(biographyElement);
+
+      aboutActorDiv.appendChild(actorDiv); // Affichage du résultat sélectionné
+    })
+    .catch((error) => {
+      console.error("There was a problem with the fetch operation:", error);
+    });
 }
 
 function performSearch() {
