@@ -144,6 +144,34 @@ function putResultInRightArea(actor) {
     });
 }
 
+function putListOfFilm() {
+  const listOfFilm = document.getElementById("about-actor-film");
+  listOfFilm.innerHTML = ""; // Effacer les résultats précédents
+
+  fetch(
+    `https://api.themoviedb.org/3/person/${actor.id}/movie_credits?api_key=${SECRET_API_KEY}`
+  )
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok: " + response.statusText);
+      }
+      return response.json();
+    })
+    .then((listMovie) => {
+      const movieList = listMovie.title;
+
+      const movieDiv = document.createElement("div");
+      movieDiv.className = "movie-list";
+
+      const movieElement = document.createElement("p");
+      movieElement.textContent = movieList;
+
+      movieDiv.appendChild(movieElement);
+
+      listOfFilm.appendChild(movieDiv);
+    });
+}
+
 function getAge(birthday, deathDate = null) {
   if (!birthday) return "Age not available";
   const birthDate = new Date(birthday);
