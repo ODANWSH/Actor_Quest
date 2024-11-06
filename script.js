@@ -1,5 +1,7 @@
 import { SECRET_API_KEY } from "./config.js";
 
+let actorsInActing = [];
+
 document
   .getElementById("search-input")
   .addEventListener("keypress", function (event) {
@@ -7,6 +9,55 @@ document
       performSearch();
     }
   });
+
+function putResultInRightArea(actor) {
+  const aboutActorDiv = document.getElementById("about-actor");
+  aboutActorDiv.innerHTML = ""; // Effacer les résultats précédents
+
+  const actorId = actor.id;
+  const actorName = actor.name;
+  const actorImage = actor.profile_path
+    ? `https://image.tmdb.org/t/p/w200${actor.profile_path}`
+    : "IMG_6163.JPG"; // Image de remplacement si manquante
+
+  fetch(
+    `https://api.themoviedb.org/3/person/${actor.id}?api_key=${SECRET_API_KEY}`
+  )
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok: " + response.statusText);
+      }
+      return response.json();
+    })
+    .then((json) => {});
+
+  // Création de la div pour l'acteur sélectionné
+  const actorDiv = document.createElement("div");
+  actorDiv.className = "actor-detail"; // Ajouter une classe pour le style
+
+  // Image de l'acteur
+  const img = document.createElement("img");
+  img.src = actorImage;
+  img.alt = actorName;
+  img.style.width = "100px";
+  img.style.height = "auto";
+
+  const nameElement = document.createElement("h2");
+  nameElement.textContent = actorName;
+
+  const putTitleBiography = document.createElement("h3");
+  putTitleBiography.textContent = "Biography :";
+
+  const biographyElement = document.createElement("p");
+  biographyElement.textContent = actorBiography;
+
+  actorDiv.appendChild(img);
+  actorDiv.appendChild(nameElement);
+  actorDiv.appendChild(biographyElement);
+  actorDiv.appendChild(putTitleBiography);
+
+  aboutActorDiv.appendChild(actorDiv); // Affichage du résultat sélectionné
+}
 
 function performSearch() {
   const query = document.getElementById("search-input").value;
@@ -20,39 +71,37 @@ function performSearch() {
       return response.json();
     })
     .then((json) => {
-      // Clear previous results
       const actorResultsDiv = document.getElementById("actor-results");
-      actorResultsDiv.innerHTML = ""; // Clear previous actor results
+      actorResultsDiv.innerHTML = ""; // Effacer les résultats précédents
 
-      // Filter to get only actors with "known_for_department" as "Acting"
-      const actorsInActing = json.results.filter(
+      // Filtrer les acteurs dans le domaine du cinéma
+      actorsInActing = json.results.filter(
         (actor) => actor.known_for_department === "Acting"
       );
 
-      // Process and display each filtered actor
       actorsInActing.forEach((actor) => {
         const actorName = actor.name;
         const actorImage = actor.profile_path
           ? `https://image.tmdb.org/t/p/w200${actor.profile_path}`
-          : "IMG_6163.JPG"; // Placeholder image
+          : "IMG_6163.JPG";
 
-        // Create a new div for each actor
+        // Créer la div pour chaque acteur
         const actorDiv = document.createElement("div");
-        actorDiv.className = "actor"; // Add a class for styling
+        actorDiv.className = "actor";
+        actorDiv.addEventListener("click", () => putResultInRightArea(actor));
 
-        // Create an image element
         const img = document.createElement("img");
         img.src = actorImage;
         img.alt = actorName;
-        img.style.width = "100px"; // Set image width
-        img.style.height = "auto"; // Maintain aspect ratio
+        img.style.width = "100px";
+        img.style.height = "auto";
 
-        // Add name and image to the actor div
-        actorDiv.appendChild(img);
         const nameElement = document.createElement("p");
-        nameElement.textContent = actorName; // Set the actor's name
-        actorDiv.appendChild(nameElement); // Add the name to the actor div
-        actorResultsDiv.appendChild(actorDiv); // Append to the results div
+        nameElement.textContent = actorName;
+
+        actorDiv.appendChild(img);
+        actorDiv.appendChild(nameElement);
+        actorResultsDiv.appendChild(actorDiv);
       });
     })
     .catch((error) => {
