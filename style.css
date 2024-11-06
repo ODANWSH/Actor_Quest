@@ -1,6 +1,7 @@
 .search-bar,
 .text-area,
-.right-text-area {
+.right-text-area,
+.right-text-area-for-film {
   width: 500px;
   padding: 0.2rem 0.6rem 0.2rem 0.2rem;
   box-sizing: border-box;
@@ -20,20 +21,30 @@
   position: absolute;
   top: 15%;
   left: 15%;
-  background: #ff6961;
+  background: #ff574d;
   height: 430px;
-  box-shadow: 1px 1px 0 0 #ff574d, 2px 2px 0 0 #ff574d, 3px 3px 0 0 #ff574d,
-    4px 4px 0 0 #ff574d, 5px 5px 0 0 #ff574d, 6px 6px 0 0 #ff574d;
+  box-shadow: 1px 1px 0 0 #e83b31, 2px 2px 0 0 #e83b31, 3px 3px 0 0 #e83b31,
+    4px 4px 0 0 #e83b31, 5px 5px 0 0 #e83b31, 6px 6px 0 0 #e83b31;
 }
 
 .right-text-area {
   position: absolute;
   top: 5%;
   left: 60%;
-  height: 470px;
+  height: 530px;
   background: #82c294;
   box-shadow: 1px 1px 0 0 #64a377, 2px 2px 0 0 #64a377, 3px 3px 0 0 #64a377,
     4px 4px 0 0 #64a377, 5px 5px 0 0 #64a377, 6px 6px 0 0 #64a377;
+}
+
+.right-text-area-for-film {
+  position: absolute;
+  top: 65%;
+  left: 60%;
+  height: 200px;
+  background: #cca9dd;
+  box-shadow: 1px 1px 0 0 #a87abe, 2px 2px 0 0 #a87abe, 3px 3px 0 0 #a87abe,
+    4px 4px 0 0 #a87abe, 5px 5px 0 0 #a87abe, 6px 6px 0 0 #a87abe;
 }
 
 .search-bar input {
@@ -59,7 +70,8 @@
 }
 
 .text-area section,
-.right-text-area section {
+.right-text-area section,
+.right-text-area-for-film section {
   height: 100%;
   width: 100%;
   padding: 0.5rem 1rem;
@@ -71,7 +83,8 @@
   overflow-y: auto; /* Add scroll for overflow */
 }
 
-.actor-results {
+.actor-results,
+.about-actor {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -83,7 +96,8 @@
   width: 120px; /* Fixed width for each actor block */
 }
 
-.actor img {
+.actor img,
+.actor-detail img {
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
