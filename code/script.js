@@ -44,7 +44,7 @@ function performSearch() {
         const actorName = actor.name;
         const actorImage = actor.profile_path
           ? `https://image.tmdb.org/t/p/w200${actor.profile_path}` // Display profile image if available
-          : "IMG_6163.JPG"; // Default image if no profile image
+          : "/IMG_6163.JPG"; // Default image if no profile image
 
         // Create a container div for each actor and set up a click event
         const actorDiv = document.createElement("div");
