@@ -121,3 +121,9 @@ body {
 .search-bar {
   margin-bottom: 20px;
 }
+.actor.selected {
+  background-color: #c1e9f2; /* Blue background for selected actor */
+  color: white; /* White text for contrast */
+  padding: 10px; /* Optional: add some padding */
+  border-radius: 5px; /* Optional: rounded corners */
+}

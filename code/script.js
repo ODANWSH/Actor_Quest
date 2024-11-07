@@ -50,6 +50,13 @@ function performSearch() {
         const actorDiv = document.createElement("div");
         actorDiv.className = "actor";
         actorDiv.addEventListener("click", () => {
+          // Clear previous highlights
+          const allActorDivs = document.querySelectorAll(".actor");
+          allActorDivs.forEach((div) => div.classList.remove("selected"));
+
+          // Highlight the selected actor
+          actorDiv.classList.add("selected");
+
           putResultInRightArea(actor); // Display actor details when clicked
           putListOfFilm(actor); // Display actor's filmography when clicked
         });
@@ -84,7 +91,7 @@ function putResultInRightArea(actor) {
   const actorName = actor.name;
   const actorImage = actor.profile_path
     ? `https://image.tmdb.org/t/p/w200${actor.profile_path}` // Use profile path if available
-    : "IMG_6163.JPG"; // Default image
+    : "/assets/IMG_6163.JPG"; // Default image
 
   // Fetch more detailed actor data from API
   fetch(
