@@ -1,6 +1,4 @@
-# Actor_Quest
-
-## API Key Configuration
+# API Key Configuration
 
 To use this application, you need to configure your API key by storing it in a separate file. Follow these steps:
 
