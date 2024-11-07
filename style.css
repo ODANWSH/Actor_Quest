@@ -1,7 +1,8 @@
 .search-bar,
 .text-area,
 .right-text-area,
-.right-text-area-for-film {
+.right-text-area-for-film,
+.history {
   width: 500px;
   padding: 0.2rem 0.6rem 0.2rem 0.2rem;
   box-sizing: border-box;
@@ -47,6 +48,16 @@
     4px 4px 0 0 #a87abe, 5px 5px 0 0 #a87abe, 6px 6px 0 0 #a87abe;
 }
 
+.history {
+  position: absolute;
+  top: 65%;
+  left: 15%;
+  height: 200px;
+  background: #fdfd96;
+  box-shadow: 1px 1px 0 0 #e9e959, 2px 2px 0 0 #e9e959, 3px 3px 0 0 #e9e959,
+    4px 4px 0 0 #e9e959, 5px 5px 0 0 #e9e959, 6px 6px 0 0 #e9e959;
+}
+
 .search-bar input {
   border: 0;
   outline: none;
@@ -71,7 +82,8 @@
 
 .text-area section,
 .right-text-area section,
-.right-text-area-for-film section {
+.right-text-area-for-film section,
+.history section {
   height: 100%;
   width: 100%;
   padding: 0.5rem 1rem;
