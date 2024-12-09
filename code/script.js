@@ -1,239 +1,210 @@
-import { SECRET_API_KEY } from "./config.js"; // Import the API key from a separate config file for security
+import { SECRET_API_KEY } from "./config.js";
 
-// Array to store actors whose primary department is "Acting"
+// Array to store actors who are in acting
 let actorsInActing = [];
+// Retrieve search history from localStorage, or initialize an empty array
+let searchHistory = JSON.parse(localStorage.getItem("searchHistory")) || [];
 
-// Add event listener for the "Enter" key to trigger search when pressed in the input field
+// Add event listener for "Enter" key press to trigger search
 document
   .getElementById("search-input")
   .addEventListener("keypress", function (event) {
     if (event.key === "Enter") {
-      performSearch(); // Call performSearch() when "Enter" is pressed
+      performSearch(); // Call performSearch function when "Enter" key is pressed
     }
   });
 
-// Add event listener for the search button to allow clicking to trigger search
+// Add event listener for the search button to trigger search
 document
   .getElementById("search-button")
-  .addEventListener("click", performSearch);
+  .addEventListener("click", performSearch); // Perform search when button is clicked
 
-// Function to perform the search by calling the API and displaying results
+// Perform the actor search using the TMDB API
 function performSearch() {
-  const query = document.getElementById("search-input").value; // Get the search query from input
+  const query = document.getElementById("search-input").value; // Get the search query
+  if (!query) return; // Prevent search if input is empty
+
+  // Save the search query to history and update the UI
+  saveToHistory(query);
+
+  // Fetch results from the TMDB API for actor search
   fetch(
     `https://api.themoviedb.org/3/search/person?api_key=${SECRET_API_KEY}&query=${query}`
   )
     .then((response) => {
-      // Check if the network response was successful
       if (!response.ok) {
-        throw new Error("Network response was not ok: " + response.statusText);
+        throw new Error("Network response was not ok: " + response.statusText); // Error handling for network response
       }
-      return response.json();
+      return response.json(); // Parse the response as JSON
     })
     .then((json) => {
       const actorResultsDiv = document.getElementById("actor-results");
-      actorResultsDiv.innerHTML = ""; // Clear previous search results
+      actorResultsDiv.innerHTML = ""; // Clear any previous results
 
-      // Filter results to only include actors with "Acting" as their main known department
+      // Filter actors that are specifically in acting
       actorsInActing = json.results.filter(
         (actor) => actor.known_for_department === "Acting"
       );
 
-      // Loop through filtered actors and create HTML elements for each
+      // Loop through each actor and display their information
       actorsInActing.forEach((actor) => {
-        const actorName = actor.name;
+        const actorName = actor.name; // Actor's name
         const actorImage = actor.profile_path
-          ? `https://image.tmdb.org/t/p/w200${actor.profile_path}` // Display profile image if available
-          : "/assets/IMG_6163.JPG"; // Default image if no profile image
+          ? `https://image.tmdb.org/t/p/w200${actor.profile_path}` // Image URL if available
+          : "/assets/IMG_6163.JPG"; // Default image if no profile path
 
-        // Create a container div for each actor and set up a click event
         const actorDiv = document.createElement("div");
-        actorDiv.className = "actor";
+        actorDiv.className = "actor"; // Add class for styling
         actorDiv.addEventListener("click", () => {
-          // Clear previous highlights
-          const allActorDivs = document.querySelectorAll(".actor");
-          allActorDivs.forEach((div) => div.classList.remove("selected"));
+          // Remove the 'selected' class from all actor divs
+          document
+            .querySelectorAll(".actor")
+            .forEach((div) => div.classList.remove("selected"));
 
-          // Highlight the selected actor
+          // Add 'selected' class to the clicked actor
           actorDiv.classList.add("selected");
 
-          putResultInRightArea(actor); // Display actor details when clicked
-          putListOfFilm(actor); // Display actor's filmography when clicked
+          // Display detailed information for the selected actor and their films
+          putResultInRightArea(actor);
+          putListOfFilm(actor);
         });
 
-        // Create an img element for the actor's image
         const img = document.createElement("img");
-        img.src = actorImage;
-        img.alt = actorName;
-        img.style.width = "100px";
-        img.style.height = "auto";
+        img.src = actorImage; // Set the image source
+        img.alt = actorName; // Set the alt text as actor name
+        img.style.width = "100px"; // Set image width
 
-        // Create a paragraph element for the actor's name
         const nameElement = document.createElement("p");
-        nameElement.textContent = actorName;
+        nameElement.textContent = actorName; // Display actor's name
 
-        // Append image and name to the actor's container div
+        // Append image and name to the actor div
         actorDiv.appendChild(img);
         actorDiv.appendChild(nameElement);
-        actorResultsDiv.appendChild(actorDiv); // Add the actor div to the results container
+        actorResultsDiv.appendChild(actorDiv); // Append actor div to the results section
       });
     })
     .catch((error) => {
-      console.error("There was a problem with the fetch operation:", error); // Log errors to console
+      console.error("Fetch operation failed:", error); // Log any fetch errors
     });
 }
 
-// Function to display detailed information about the selected actor
+// Display detailed information about the selected actor
 function putResultInRightArea(actor) {
   const aboutActorDiv = document.getElementById("about-actor");
   aboutActorDiv.innerHTML = ""; // Clear previous details
 
-  const actorName = actor.name;
   const actorImage = actor.profile_path
-    ? `https://image.tmdb.org/t/p/w200${actor.profile_path}` // Use profile path if available
-    : "/assets/IMG_6163.JPG"; // Default image
+    ? `https://image.tmdb.org/t/p/w200${actor.profile_path}` // Actor's profile image
+    : "/assets/IMG_6163.JPG"; // Default image if no profile path
 
-  // Fetch more detailed actor data from API
+  // Fetch detailed actor information from the TMDB API
   fetch(
     `https://api.themoviedb.org/3/person/${actor.id}?api_key=${SECRET_API_KEY}`
   )
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok: " + response.statusText);
-      }
-      return response.json();
-    })
+    .then((response) => response.json()) // Parse the response as JSON
     .then((detailedActor) => {
-      let actorBiography =
-        detailedActor.biography || "This actor does not have a biography."; // Use biography or default text
-      let age = getAge(detailedActor.birthday, detailedActor.deathday); // Calculate age
-      let dateOfDeath = detailedActor.deathday || "This actor is not dead."; // Display death date or default text
-
-      // Create HTML elements for actor details
       const actorDiv = document.createElement("div");
-      actorDiv.className = "actor-detail";
+      actorDiv.className = "actor-detail"; // Add class for styling
 
       const img = document.createElement("img");
-      img.src = actorImage;
-      img.alt = actorName;
-      img.style.width = "100px";
-      img.style.height = "auto";
+      img.src = actorImage; // Actor's image
+      img.alt = actor.name; // Actor's name as alt text
+      img.style.width = "150px"; // Set image width
 
       const nameElement = document.createElement("h2");
-      nameElement.textContent = actorName;
+      nameElement.textContent = actor.name; // Display actor's name
 
-      const ageElement = document.createElement("p");
-      ageElement.textContent = `Age: ${age}`;
+      const bioElement = document.createElement("p");
+      bioElement.textContent =
+        detailedActor.biography || "Biography not available."; // Display biography or default message
 
-      const deathDay = document.createElement("p");
-      deathDay.textContent = `Date of death: ${dateOfDeath}`;
+      const birthdayElement = document.createElement("p");
+      birthdayElement.textContent = `Born: ${detailedActor.birthday || "N/A"}`; // Display birthday
 
-      // Alternative names
-      const alternativeNamesTitle = document.createElement("h3");
-      alternativeNamesTitle.textContent = "Also known as:";
-      const alternativeNamesList = document.createElement("ul");
+      const placeOfBirthElement = document.createElement("p");
+      placeOfBirthElement.textContent = `Place of Birth: ${
+        detailedActor.place_of_birth || "N/A"
+      }`; // Display place of birth
 
-      // List alternative names or show a default message
-      if (
-        detailedActor.also_known_as &&
-        detailedActor.also_known_as.length > 0
-      ) {
-        detailedActor.also_known_as.forEach((name) => {
-          const nameItem = document.createElement("li");
-          nameItem.textContent = name;
-          alternativeNamesList.appendChild(nameItem);
-        });
-      } else {
-        const noNames = document.createElement("p");
-        noNames.textContent = "No alternative names available.";
-        alternativeNamesList.appendChild(noNames);
-      }
-
-      // Add biography title and content
-      const biographyTitle = document.createElement("h3");
-      biographyTitle.textContent = "Biography:";
-      const biographyElement = document.createElement("p");
-      biographyElement.textContent = actorBiography;
-
-      // Append all details to the main div
+      // Append actor details to the actor div
       actorDiv.appendChild(img);
       actorDiv.appendChild(nameElement);
-      actorDiv.appendChild(ageElement);
-      actorDiv.appendChild(deathDay);
-      actorDiv.appendChild(alternativeNamesTitle);
-      actorDiv.appendChild(alternativeNamesList);
-      actorDiv.appendChild(biographyTitle);
-      actorDiv.appendChild(biographyElement);
+      actorDiv.appendChild(bioElement);
+      actorDiv.appendChild(birthdayElement);
+      actorDiv.appendChild(placeOfBirthElement);
 
-      aboutActorDiv.appendChild(actorDiv); // Add actor details to the main container
+      aboutActorDiv.appendChild(actorDiv); // Append actor details to the right section
     })
     .catch((error) => {
-      console.error("There was a problem with the fetch operation:", error); // Log errors
+      console.error("Failed to fetch actor details:", error); // Log any errors
     });
 }
 
-// Function to display the list of movies the actor appeared in
+// Display the list of movies the actor has appeared in
 function putListOfFilm(actor) {
   const listOfFilm = document.getElementById("about-actor-film");
-  listOfFilm.innerHTML = ""; // Clear previous film list
+  listOfFilm.innerHTML = ""; // Clear previous films
 
-  // Fetch actor's movie credits from API
+  // Fetch movie credits for the actor
   fetch(
     `https://api.themoviedb.org/3/person/${actor.id}/movie_credits?api_key=${SECRET_API_KEY}`
   )
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok: " + response.statusText);
-      }
-      return response.json();
-    })
+    .then((response) => response.json()) // Parse the response as JSON
     .then((listMovie) => {
       const movieDiv = document.createElement("div");
-      movieDiv.className = "movie-list";
+      movieDiv.className = "movie-list"; // Add class for styling
 
-      // Title for the movie list
       const movieTitle = document.createElement("h3");
-      movieTitle.textContent = "Movies:";
+      movieTitle.textContent = "Movies:"; // Title for movie list
       movieDiv.appendChild(movieTitle);
 
-      const movieList = document.createElement("ul");
+      const movieList = document.createElement("ul"); // Create a list for movies
+      listMovie.cast.forEach((movie) => {
+        const filmItem = document.createElement("li");
+        // Display movie title and release year (if available)
+        filmItem.textContent = `${movie.title} (${
+          movie.release_date?.split("-")[0] || "N/A"
+        })`;
+        movieList.appendChild(filmItem); // Add each movie to the list
+      });
 
-      // Add each movie to the list or display a default message if none found
-      if (listMovie.cast && listMovie.cast.length > 0) {
-        listMovie.cast.forEach((movie) => {
-          const filmItem = document.createElement("li");
-          filmItem.textContent = `${movie.title} (${
-            movie.release_date?.split("-")[0] || "N/A"
-          })`;
-          movieList.appendChild(filmItem);
-        });
-      } else {
-        const noMovie = document.createElement("p");
-        noMovie.textContent = "No movies available.";
-        movieDiv.appendChild(noMovie);
-      }
-
-      movieDiv.appendChild(movieList);
-      listOfFilm.appendChild(movieDiv);
+      movieDiv.appendChild(movieList); // Append the movie list to the div
+      listOfFilm.appendChild(movieDiv); // Append movie div to the right section
+    })
+    .catch((error) => {
+      console.error("Failed to fetch movie credits:", error); // Log any errors
     });
 }
 
-// Function to calculate the age of the actor from birthdate and death date (if applicable)
-function getAge(birthday, deathDate = null) {
-  if (!birthday) return "Age not available";
-  const birthDate = new Date(birthday);
-  const endDate = deathDate ? new Date(deathDate) : new Date();
+// Save the search query to localStorage and update the search history UI
+function saveToHistory(query) {
+  // Remove the query if it already exists in history
+  searchHistory = searchHistory.filter((item) => item !== query);
 
-  // Calculate age by subtracting years and adjusting for months/days
-  let age = endDate.getFullYear() - birthDate.getFullYear();
-  const monthDifference = endDate.getMonth() - birthDate.getMonth();
+  // Add the new query to the beginning of the history
+  searchHistory.unshift(query);
 
-  if (
-    monthDifference < 0 ||
-    (monthDifference === 0 && endDate.getDate() < birthDate.getDate())
-  ) {
-    age--;
-  }
-
-  return `${age} years old`; // Return age as a formatted string
+  // Save the updated history to localStorage
+  localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
+  updateHistoryUI(); // Update the UI with the new history
 }
+
+function updateHistoryUI() {
+  const historyDiv = document.querySelector(".user-history");
+  historyDiv.innerHTML = ""; // Clear current history display
+
+  const historyTitle = document.createElement("h3");
+  historyTitle.textContent = "Search History:"; // Add a title for the history section
+  historyDiv.appendChild(historyTitle); // Append the title to the history section
+
+  const historyList = document.createElement("ul"); // Create an unordered list for the history items
+  searchHistory.forEach((query) => {
+    const historyItem = document.createElement("li"); // Create a list item for each search query
+    historyItem.textContent = query; // Set the text content to the search query
+    historyList.appendChild(historyItem); // Add the item to the list
+  });
+
+  historyDiv.appendChild(historyList); // Append the list to the history section
+}
+// Initialize history on page load by calling the update function
+updateHistoryUI();
