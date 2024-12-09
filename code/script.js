@@ -51,7 +51,7 @@ function performSearch() {
         const actorName = actor.name; // Actor's name
         const actorImage = actor.profile_path
           ? `https://image.tmdb.org/t/p/w200${actor.profile_path}` // Image URL if available
-          : "/assets/IMG_6163.JPG"; // Default image if no profile path
+          : "https://minardi.needemand.com/Projet_Actor_Quest/assets/IMG_6163.JPG"; // Default image if no profile path
 
         const actorDiv = document.createElement("div");
         actorDiv.className = "actor"; // Add class for styling
@@ -95,7 +95,7 @@ function putResultInRightArea(actor) {
 
   const actorImage = actor.profile_path
     ? `https://image.tmdb.org/t/p/w200${actor.profile_path}` // Actor's profile image
-    : "/assets/IMG_6163.JPG"; // Default image if no profile path
+    : "https://minardi.needemand.com/Projet_Actor_Quest/assets/IMG_6163.JPG"; // Default image if no profile path
 
   // Fetch detailed actor information from the TMDB API
   fetch(
